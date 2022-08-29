@@ -2,19 +2,18 @@
   <!-- <WeatherBG> -->
   <h1>Weather App</h1>
   <div>
-    <form @submit.prevent="submitSearchText">
+    <form @submit.prevent="submitSearchForm">
       <input type="text" placeholder="Enter a city" v-model="enteredCity" />
-      <p>{{ enteredCity }}</p>
       <button>Search</button>
     </form>
     <div>
       <p>notification</p>
 
-      <div>location</div>
+      <div>{{ fetchedWeatherData.location }}</div>
       <div>
         <div>
-          <div>weather main</div>
-          <div>weather description</div>
+          <div>{{ fetchedWeatherData.main }}</div>
+          <div>{{ fetchedWeatherData.description }}</div>
         </div>
         <!-- <WeatherIcon /> -->
       </div>
@@ -31,9 +30,20 @@ export default {
   setup() {
     const API = process.env.VUE_APP_API_KEY;
     const enteredCity = ref(null);
+    const fetchedWeatherData = ref({});
 
-    const submitSearchText = (e) => {
+    const submitSearchForm = async () => {
       console.log(enteredCity.value);
+      //fetch weather data here
+      const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
+        enteredCity.value,
+        API
+      );
+      await fetchData();
+      // console.log(weatherData.value);
+      fetchedWeatherData.value = weatherData.value;
+      await console.log(fetchedWeatherData.value);
+      enteredCity.value = '';
     };
 
     // onMounted(() => {
@@ -45,7 +55,7 @@ export default {
     //   // console.log(weatherData, errorMsg);
     // });
 
-    return { enteredCity, submitSearchText };
+    return { enteredCity, fetchedWeatherData, submitSearchForm };
   },
 };
 </script>
