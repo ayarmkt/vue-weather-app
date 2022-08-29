@@ -2,8 +2,9 @@
   <!-- <WeatherBG> -->
   <h1>Weather App</h1>
   <div>
-    <form>
-      <input type="text" placeholder="Enter a city" />
+    <form @submit.prevent="submitSearchText">
+      <input type="text" placeholder="Enter a city" v-model="enteredCity" />
+      <p>{{ enteredCity }}</p>
       <button>Search</button>
     </form>
     <div>
@@ -23,19 +24,28 @@
 </template>
 
 <script>
-import { onMounted } from '@vue/runtime-core';
+import { ref } from 'vue';
+
 import fetchWeatherData from '../api/fetchWeatherData';
 export default {
   setup() {
     const API = process.env.VUE_APP_API_KEY;
-    onMounted(() => {
-      const { weatherData, errorMsg, fetchData } = fetchWeatherData(
-        'Tokyo',
-        API
-      );
-      fetchData();
-      console.log(weatherData, errorMsg);
-    });
+    const enteredCity = ref(null);
+
+    const submitSearchText = (e) => {
+      console.log(enteredCity.value);
+    };
+
+    // onMounted(() => {
+    //   const { weatherData, errorMsg, fetchData } = fetchWeatherData(
+    //     'Tokyo',
+    //     API
+    //   );
+    //   fetchData();
+    //   // console.log(weatherData, errorMsg);
+    // });
+
+    return { enteredCity, submitSearchText };
   },
 };
 </script>

@@ -14,7 +14,7 @@ const fetchWeatherData = (city, API) => {
       }
 
       weatherData.value = await response.json();
-      console.log(weatherData.value);
+      // console.log(weatherData.value);
     } catch (error) {
       errorMsg.value = error.message;
       console.log(error.value);
