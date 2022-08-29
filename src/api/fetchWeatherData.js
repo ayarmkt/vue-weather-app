@@ -1,8 +1,9 @@
 import { ref } from 'vue';
 
 const fetchWeatherData = (city, API) => {
-  const weatherData = ref(null);
+  const weatherData = ref({ location: null, main: null, description: null });
   const errorMsg = ref(null);
+
   const fetchData = async () => {
     try {
       const response = await fetch(
@@ -14,12 +15,20 @@ const fetchWeatherData = (city, API) => {
       }
 
       weatherData.value = await response.json();
+      // console.log(weatherData.value.weather[0].main);
+      // console.log(weatherData.value.weather[0].description);
+      weatherData.value = {
+        location: city,
+        main: weatherData.value.weather[0].main,
+        description: weatherData.value.weather[0].description,
+      };
       // console.log(weatherData.value);
     } catch (error) {
       errorMsg.value = error.message;
       console.log(error.value);
     }
   };
+
   return { weatherData, errorMsg, fetchData };
 };
 
