@@ -1,61 +1,74 @@
 <template>
   <!-- <WeatherBG> -->
-  <h1>Weather App</h1>
-  <div>
-    <form @submit.prevent="submitSearchForm">
-      <input type="text" placeholder="Enter a city" v-model="enteredCity" />
-      <button>Search</button>
-    </form>
+  <Background
+    :bgClassName="bgClassName ? bgClassName : 'default'"
+    :textColor="displayTextColor ? displayTextColor : null"
+  >
+    <h1>Weather App</h1>
     <div>
-      <p>notification</p>
-
-      <div>{{ fetchedWeatherData.location }}</div>
+      <form @submit.prevent="submitSearchForm">
+        <input type="text" placeholder="Enter a city" v-model="enteredCity" />
+        <button>Search</button>
+      </form>
       <div>
+        <p>notification</p>
+
+        <div>{{ fetchedWeatherData.location }}</div>
         <div>
-          <div>{{ fetchedWeatherData.main }}</div>
-          <div>{{ fetchedWeatherData.description }}</div>
+          <div>
+            <div>{{ fetchedWeatherData.main }}</div>
+            <div>{{ fetchedWeatherData.description }}</div>
+          </div>
+          <!-- <WeatherIcon /> -->
         </div>
-        <!-- <WeatherIcon /> -->
       </div>
     </div>
-  </div>
+  </Background>
   <!-- </WeatherBG> -->
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, provide } from 'vue';
+import Background from '../components/Background.vue';
 
 import fetchWeatherData from '../api/fetchWeatherData';
+import renderWeatherStyling from '../functions/renderWeatherStyling';
+
 export default {
+  components: { Background },
   setup() {
     const API = process.env.VUE_APP_API_KEY;
     const enteredCity = ref(null);
     const fetchedWeatherData = ref({});
+    const bgClassName = ref(null);
+    const displayTextColor = ref(null);
 
     const submitSearchForm = async () => {
-      console.log(enteredCity.value);
-      //fetch weather data here
+      //FETCH WEATHER DATA
       const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
         enteredCity.value,
         API
       );
       await fetchData();
-      // console.log(weatherData.value);
       fetchedWeatherData.value = weatherData.value;
-      await console.log(fetchedWeatherData.value);
       enteredCity.value = '';
+
+      //CHANGE BACKGROUND CLASSNAME
+      if (fetchWeatherData) {
+        const { weatherClassname, weatherIcon, textColor } =
+          renderWeatherStyling(fetchedWeatherData.value.main);
+        bgClassName.value = weatherClassname;
+        displayTextColor.value = textColor;
+      }
     };
 
-    // onMounted(() => {
-    //   const { weatherData, errorMsg, fetchData } = fetchWeatherData(
-    //     'Tokyo',
-    //     API
-    //   );
-    //   fetchData();
-    //   // console.log(weatherData, errorMsg);
-    // });
-
-    return { enteredCity, fetchedWeatherData, submitSearchForm };
+    return {
+      enteredCity,
+      fetchedWeatherData,
+      bgClassName,
+      displayTextColor,
+      submitSearchForm,
+    };
   },
 };
 </script>
