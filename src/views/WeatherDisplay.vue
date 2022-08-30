@@ -11,31 +11,38 @@
       </form>
       <div class="text-container" v-if="fetchedWeatherData">
         <!-- <p>notification</p> -->
-        <div class="location">{{ fetchedWeatherData.location }}</div>
-        <div class="weather">
-          <div class="weather-text">
-            <div class="weather-main">{{ fetchedWeatherData.main }}</div>
-            <div class="weather-description">
-              {{ fetchedWeatherData.description }}
+
+        <p class="message" v-if="!isLoading && errorMessage">
+          {{ errorMessage }}
+        </p>
+        <template v-if="!isLoading && fetchedWeatherData.location">
+          <div class="location">{{ fetchedWeatherData.location }}</div>
+          <div class="weather">
+            <div class="weather-text">
+              <div class="weather-main">{{ fetchedWeatherData.main }}</div>
+              <div class="weather-description">
+                {{ fetchedWeatherData.description }}
+              </div>
+            </div>
+            <div class="icon">
+              <font-awesome-icon
+                :icon="stylingData.iconProps"
+                :style="{
+                  width: '220px',
+                  height: 'auto',
+                }"
+              />
             </div>
           </div>
-          <div class="icon">
-            <font-awesome-icon
-              :icon="stylingData.iconProps"
-              :style="{
-                width: '220px',
-                height: 'auto',
-              }"
-            />
-          </div>
-        </div>
+        </template>
+        <p class="message" v-if="isLoading">Loading...</p>
       </div>
     </div>
   </Background>
 </template>
 
 <script>
-import { ref, provide, watchEffect } from 'vue';
+import { ref, provide, onMounted } from 'vue';
 import Background from '../components/Background.vue';
 import fetchWeatherData from '../api/fetchWeatherData';
 import renderWeatherStyling from '../functions/renderWeatherStyling';
@@ -51,19 +58,34 @@ export default {
       textColorClass: null,
       iconProps: null,
     });
+    const errorMessage = ref(null);
+    const isLoading = ref(false);
+    // const notification = ref(null);
 
     const searchWeather = async (city) => {
+      isLoading.value = true;
+      console.log(isLoading.value);
       //FETCH WEATHER DATA
-      const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
-        city,
-        API
-      );
+      const {
+        weatherData,
+        errorMsg,
+        //notificationStatus,
+        fetchData,
+      } = await fetchWeatherData(city, API);
       await fetchData();
-      fetchedWeatherData.value = weatherData.value;
+      // if (errorMsg) {
+      //   errorMessage.value = errorMsg;
+      //   console.log(errorMessage.value);
+      // }
+      fetchedWeatherData.value = await weatherData.value;
       enteredCity.value = '';
+      // console.log(notificationStatus.value);
+      // console.log(fetchWeatherData.value, weatherData.value);
 
       //CHANGE BACKGROUND CLASSNAME
-      if (fetchWeatherData) {
+      if (weatherData.value.location) {
+        // console.log(errorMessage.value);
+        console.log(weatherData.value);
         const { weatherClassname, weatherIcon, textColor } =
           renderWeatherStyling(fetchedWeatherData.value.main);
         stylingData.value = {
@@ -71,20 +93,38 @@ export default {
           textColorClass: textColor,
           iconProps: weatherIcon.props.icon,
         };
+      } else {
+        // notification.value = notificationStatus.value;
+        // console.log(notification.value);
+        // errorMessage.value = notificationStatus.value.message;
+        // errorMessage.value = errorMsg.value;
+        console.log(errorMessage.value);
       }
+      errorMessage.value = errorMsg.value;
+      isLoading.value = false;
+      console.log(isLoading.value);
     };
 
     const submitSearchForm = async () => {
       searchWeather(enteredCity.value);
     };
 
-    watchEffect(() => {
+    onMounted(() => {
       searchWeather('Tokyo');
     });
+
+    // watchEffect(() => {
+    //   // console.log(isLoading.value);
+    //   searchWeather('Tokyo');
+    //   // isLoading.value = false;
+    //   // console.log(isLoading.value);
+    // });
 
     return {
       enteredCity,
       fetchedWeatherData,
+      isLoading,
+      errorMessage,
       stylingData,
       submitSearchForm,
     };
