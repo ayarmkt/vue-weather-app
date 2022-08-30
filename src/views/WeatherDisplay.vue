@@ -1,32 +1,38 @@
 <template>
   <!-- <WeatherBG> -->
-  <h1>Weather App</h1>
-  <div>
-    <form @submit.prevent="submitSearchForm">
-      <input type="text" placeholder="Enter a city" v-model="enteredCity" />
-      <button>Search</button>
-    </form>
+  <Background>
+    <h1>Weather App</h1>
     <div>
-      <p>notification</p>
-
-      <div>{{ fetchedWeatherData.location }}</div>
+      <form @submit.prevent="submitSearchForm">
+        <input type="text" placeholder="Enter a city" v-model="enteredCity" />
+        <button>Search</button>
+      </form>
       <div>
+        <p>notification</p>
+
+        <div>{{ fetchedWeatherData.location }}</div>
         <div>
-          <div>{{ fetchedWeatherData.main }}</div>
-          <div>{{ fetchedWeatherData.description }}</div>
+          <div>
+            <div>{{ fetchedWeatherData.main }}</div>
+            <div>{{ fetchedWeatherData.description }}</div>
+          </div>
+          <!-- <WeatherIcon /> -->
         </div>
-        <!-- <WeatherIcon /> -->
       </div>
     </div>
-  </div>
+  </Background>
   <!-- </WeatherBG> -->
 </template>
 
 <script>
 import { ref } from 'vue';
+import Background from '../components/Background.vue';
 
 import fetchWeatherData from '../api/fetchWeatherData';
+import renderWeatherStyling from '../functions/renderWeatherStyling';
+
 export default {
+  components: { Background },
   setup() {
     const API = process.env.VUE_APP_API_KEY;
     const enteredCity = ref(null);
@@ -44,6 +50,11 @@ export default {
       fetchedWeatherData.value = weatherData.value;
       await console.log(fetchedWeatherData.value);
       enteredCity.value = '';
+      const { weatherClassname, weatherIcon, textColor } =
+        renderWeatherStyling('Clouds');
+      console.log(weatherClassname);
+      console.log(weatherIcon);
+      console.log(textColor);
     };
 
     // onMounted(() => {
