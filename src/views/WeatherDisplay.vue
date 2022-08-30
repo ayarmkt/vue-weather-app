@@ -1,6 +1,9 @@
 <template>
   <!-- <WeatherBG> -->
-  <Background>
+  <Background
+    :bgClassName="bgClassName ? bgClassName : 'default'"
+    :textColor="displayTextColor ? displayTextColor : null"
+  >
     <h1>Weather App</h1>
     <div>
       <form @submit.prevent="submitSearchForm">
@@ -25,7 +28,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, provide } from 'vue';
 import Background from '../components/Background.vue';
 
 import fetchWeatherData from '../api/fetchWeatherData';
@@ -37,36 +40,35 @@ export default {
     const API = process.env.VUE_APP_API_KEY;
     const enteredCity = ref(null);
     const fetchedWeatherData = ref({});
+    const bgClassName = ref(null);
+    const displayTextColor = ref(null);
 
     const submitSearchForm = async () => {
-      console.log(enteredCity.value);
-      //fetch weather data here
+      //FETCH WEATHER DATA
       const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
         enteredCity.value,
         API
       );
       await fetchData();
-      // console.log(weatherData.value);
       fetchedWeatherData.value = weatherData.value;
-      await console.log(fetchedWeatherData.value);
       enteredCity.value = '';
-      const { weatherClassname, weatherIcon, textColor } =
-        renderWeatherStyling('Clouds');
-      console.log(weatherClassname);
-      console.log(weatherIcon);
-      console.log(textColor);
+
+      //CHANGE BACKGROUND CLASSNAME
+      if (fetchWeatherData) {
+        const { weatherClassname, weatherIcon, textColor } =
+          renderWeatherStyling(fetchedWeatherData.value.main);
+        bgClassName.value = weatherClassname;
+        displayTextColor.value = textColor;
+      }
     };
 
-    // onMounted(() => {
-    //   const { weatherData, errorMsg, fetchData } = fetchWeatherData(
-    //     'Tokyo',
-    //     API
-    //   );
-    //   fetchData();
-    //   // console.log(weatherData, errorMsg);
-    // });
-
-    return { enteredCity, fetchedWeatherData, submitSearchForm };
+    return {
+      enteredCity,
+      fetchedWeatherData,
+      bgClassName,
+      displayTextColor,
+      submitSearchForm,
+    };
   },
 };
 </script>
