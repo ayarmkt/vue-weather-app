@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { ref, provide } from 'vue';
+import { ref, provide, watchEffect } from 'vue';
 import Background from '../components/Background.vue';
 import fetchWeatherData from '../api/fetchWeatherData';
 import renderWeatherStyling from '../functions/renderWeatherStyling';
@@ -43,14 +43,11 @@ export default {
       textColorClass: null,
       iconProps: null,
     });
-    // const bgClassName = ref(null);
-    // const textColorClass = ref(null);
-    // const iconProps = ref(null);
 
-    const submitSearchForm = async () => {
+    const searchWeather = async (city) => {
       //FETCH WEATHER DATA
       const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
-        enteredCity.value,
+        city,
         API
       );
       await fetchData();
@@ -66,19 +63,21 @@ export default {
           textColorClass: textColor,
           iconProps: weatherIcon.props.icon,
         };
-        // bgClassName.value = weatherClassname;
-        // textColorClass.value = textColor;
-        // iconProps.value = weatherIcon.props.icon;
       }
     };
+
+    const submitSearchForm = async () => {
+      searchWeather(enteredCity.value);
+    };
+
+    watchEffect(() => {
+      searchWeather('Tokyo');
+    });
 
     return {
       enteredCity,
       fetchedWeatherData,
       stylingData,
-      // bgClassName,
-      // textColorClass,
-      // iconProps,
       submitSearchForm,
     };
   },
