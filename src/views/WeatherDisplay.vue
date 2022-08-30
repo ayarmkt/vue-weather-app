@@ -1,7 +1,8 @@
 <template>
   <!-- <WeatherBG> -->
-  <Background>
+  <Background :bgClassName="bgClassName ? bgClassName : 'default'">
     <h1>Weather App</h1>
+    <p>CLASSNAME: {{ bgClassName }}</p>
     <div>
       <form @submit.prevent="submitSearchForm">
         <input type="text" placeholder="Enter a city" v-model="enteredCity" />
@@ -25,7 +26,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, provide } from 'vue';
 import Background from '../components/Background.vue';
 
 import fetchWeatherData from '../api/fetchWeatherData';
@@ -37,24 +38,27 @@ export default {
     const API = process.env.VUE_APP_API_KEY;
     const enteredCity = ref(null);
     const fetchedWeatherData = ref({});
+    const bgClassName = ref(null);
 
     const submitSearchForm = async () => {
-      console.log(enteredCity.value);
-      //fetch weather data here
+      //FETCH WEATHER DATA
       const { weatherData, errorMsg, fetchData } = await fetchWeatherData(
         enteredCity.value,
         API
       );
       await fetchData();
-      // console.log(weatherData.value);
       fetchedWeatherData.value = weatherData.value;
-      await console.log(fetchedWeatherData.value);
       enteredCity.value = '';
-      const { weatherClassname, weatherIcon, textColor } =
-        renderWeatherStyling('Clouds');
-      console.log(weatherClassname);
-      console.log(weatherIcon);
-      console.log(textColor);
+
+      //CHANGE BACKGROUND CLASSNAME
+      if (fetchWeatherData) {
+        console.log(fetchedWeatherData.value.main);
+        const { weatherClassname, weatherIcon, textColor } =
+          renderWeatherStyling(fetchedWeatherData.value.main);
+        console.log(weatherClassname);
+        bgClassName.value = weatherClassname;
+        console.log(bgClassName.value);
+      }
     };
 
     // onMounted(() => {
@@ -66,7 +70,7 @@ export default {
     //   // console.log(weatherData, errorMsg);
     // });
 
-    return { enteredCity, fetchedWeatherData, submitSearchForm };
+    return { enteredCity, fetchedWeatherData, bgClassName, submitSearchForm };
   },
 };
 </script>
