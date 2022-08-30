@@ -15,14 +15,11 @@ const fetchWeatherData = (city, API) => {
       }
 
       weatherData.value = await response.json();
-      // console.log(weatherData.value.weather[0].main);
-      // console.log(weatherData.value.weather[0].description);
       weatherData.value = {
-        location: city,
+        location: weatherData.value.name,
         main: weatherData.value.weather[0].main,
         description: weatherData.value.weather[0].description,
       };
-      // console.log(weatherData.value);
     } catch (error) {
       errorMsg.value = error.message;
       console.log(error.value);
