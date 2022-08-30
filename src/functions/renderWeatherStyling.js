@@ -42,7 +42,30 @@ const renderWeatherStyling = (main) => {
     case 'Dust':
     case 'Sand':
     case 'Ash': {
-      weatherClassname = 'fog';
+      switch (main) {
+        case 'Smoke':
+        case 'Mist': {
+          weatherClassname = 'mist';
+          break;
+        }
+        case 'Haze': {
+          weatherClassname = 'haze';
+          break;
+        }
+        case 'Dust':
+        case 'Sand': {
+          weatherClassname = 'sand';
+          break;
+        }
+        case 'Ash': {
+          weatherClassname = 'ash';
+          break;
+        }
+        default: {
+          weatherClassname = 'fog';
+          break;
+        }
+      }
       weatherIcon = <font-awesome-icon icon='fa-solid fa-smog' />;
       break;
     }

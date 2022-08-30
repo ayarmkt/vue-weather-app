@@ -1,8 +1,10 @@
 <template>
   <!-- <WeatherBG> -->
-  <Background :bgClassName="bgClassName ? bgClassName : 'default'">
+  <Background
+    :bgClassName="bgClassName ? bgClassName : 'default'"
+    :textColor="displayTextColor ? displayTextColor : null"
+  >
     <h1>Weather App</h1>
-    <p>CLASSNAME: {{ bgClassName }}</p>
     <div>
       <form @submit.prevent="submitSearchForm">
         <input type="text" placeholder="Enter a city" v-model="enteredCity" />
@@ -39,6 +41,7 @@ export default {
     const enteredCity = ref(null);
     const fetchedWeatherData = ref({});
     const bgClassName = ref(null);
+    const displayTextColor = ref(null);
 
     const submitSearchForm = async () => {
       //FETCH WEATHER DATA
@@ -52,25 +55,20 @@ export default {
 
       //CHANGE BACKGROUND CLASSNAME
       if (fetchWeatherData) {
-        console.log(fetchedWeatherData.value.main);
         const { weatherClassname, weatherIcon, textColor } =
           renderWeatherStyling(fetchedWeatherData.value.main);
-        console.log(weatherClassname);
         bgClassName.value = weatherClassname;
-        console.log(bgClassName.value);
+        displayTextColor.value = textColor;
       }
     };
 
-    // onMounted(() => {
-    //   const { weatherData, errorMsg, fetchData } = fetchWeatherData(
-    //     'Tokyo',
-    //     API
-    //   );
-    //   fetchData();
-    //   // console.log(weatherData, errorMsg);
-    // });
-
-    return { enteredCity, fetchedWeatherData, bgClassName, submitSearchForm };
+    return {
+      enteredCity,
+      fetchedWeatherData,
+      bgClassName,
+      displayTextColor,
+      submitSearchForm,
+    };
   },
 };
 </script>
